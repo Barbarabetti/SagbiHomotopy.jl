@@ -1,0 +1,13 @@
+name = "SagbiHomotopy"
+UUID = "79f7b27e-1e7f-49b0-a183-48c80ed555cb"
+authors = ["Barbara Betti and Viktoriia Borovik"]
+version = "1.0.0"
+
+[deps]
+AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
+Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+HomotopyContinuation = "f213a82b-91d6-5c5d-acf7-10f1c761b327"
+Oscar = "f1435218-dba5-11e9-1e4d-f1a5fab5fc13"
+
+[compat]
+AbstractAlgebra = "0.43.12"
