@@ -1,7 +1,7 @@
 name = "SagbiHomotopy"
 uuid = "79f7b27e-1e7f-49b0-a183-48c80ed555cb"
 authors = ["Barbara Betti and Viktoriia Borovik"]
-version = "1.0.0"
+version = "1.0.1"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
