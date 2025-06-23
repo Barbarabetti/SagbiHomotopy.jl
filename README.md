@@ -10,7 +10,7 @@ SagbiHomotopy is a Julia package to solve equations that are expressed as linear
 using Pkg
 Pkg.add("SagbiHomotopy")
 ```
-SagbiHomotopy is supported on Julia 1.11.3 and later.
+SagbiHomotopy is supported on Julia 1.10 and later.
 
 ## Example
 
