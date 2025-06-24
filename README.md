@@ -32,7 +32,7 @@ degree_monomial_map(sagbi,w)
 @var p[1:4]
 @var q[1:4]
 
-lin_sys = [ rand(Int64,2,4)*p , rand(Int64,1,4)*q]
+lin_sys = [ rand(ComplexF64,2,4)*p , rand(ComplexF64,1,4)*q]
 
 @time sagbi_homotopy(lin_sys, sagbi; weight = w)
 ```
