@@ -21,9 +21,9 @@ using SagbiHomotopy
 using HomotopyContinuation
 using Oscar 
 
-@var x,y, z
+@var x, y, z
 
-sagbi = [[x,y,(x^2 + y^2), 1], [y, z, (x^2 + y^2), (x^3 + z^3)]]
+sagbi = [[x, y, (x^2 + y^2), 1], [y, z, (x^2 + y^2), (x^3 + z^3)]]
 w = get_weight(sagbi)
 
 degree_map(sagbi)
@@ -32,7 +32,7 @@ degree_monomial_map(sagbi,w)
 @var p[1:4]
 @var q[1:4]
 
-lin_sys = [ rand(ComplexF64,2,4)*p , rand(ComplexF64,1,4)*q]
+lin_sys = [rand(ComplexF64,2,4)*p, rand(ComplexF64,1,4)*q]
 
 @time sagbi_homotopy(lin_sys, sagbi; weight = w)
 ```
