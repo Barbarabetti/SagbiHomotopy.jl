@@ -18,8 +18,7 @@ weight_deformation_for_poly,
 degree_map,
 degree_monomial_map,
 isolated_nsols_baselocus,
-get_base_locus,
-get_sagbi_grassmannian
+get_base_locus
 
 
 include("Utils.jl")
