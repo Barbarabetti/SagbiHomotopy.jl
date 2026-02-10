@@ -3,31 +3,28 @@
 # ------------------- Input:
 # poss_sagbi          Union{Vector{Vector{Expression}}
 # ------------------- Output:
-# w                   Vector{Int} 
+# w                   Vector{Int}
 
-function get_weight(poss_sagbi::Union{Vector{Vector{Expression}}, Vector{Expression}} )
-    
-    if typeof(poss_sagbi) == Vector{Expression}
-        poss_sagbi = [poss_sagbi]
-    end
+function get_weight(poss_sagbi::Union{Vector{Vector{Expression}}, Vector{Expression}, Vector{Vector{Vector{Expression}}}})
+    poss_sagbi = normalize_param_groups(poss_sagbi)::Vector{Vector{Expression}}
 
     l = length(poss_sagbi)
     #vars = unique(vcat(variables.(poss_sagbi)...))
-    vars = variables(vcat(poss_sagbi...))
+    vars = variables(flatten_expressions(poss_sagbi))
 
-    @unique_var t[1:l] 
-    vars2 = tuple(vcat(t,vars)...)
-    R, vars2 = Oscar.polynomial_ring(Oscar.QQ, vcat(["t$i" for i=1:l ],string.(vars)))
-    
-    poss_sagbiOscar = vcat([vars2[i].*([HC_to_oscar(f, gens(R)[l+1:end], vars) for f in poss_sagbi[i]]) for i=1:l ]...)
+    @unique_var t[1:l]
+    vars2 = tuple(vcat(t, vars)...)
+    R, vars2 = Oscar.polynomial_ring(Oscar.QQ, vcat(["t$i" for i in 1:l ], string.(vars)))
+
+    poss_sagbiOscar = vcat([vars2[i] .* ([HC_to_oscar(f, gens(R)[(l + 1):end], vars) for f in poss_sagbi[i]]) for i in 1:l ]...)
 
     w = weightVectorsRealizingSAGBI(poss_sagbiOscar, R)
 
-    if typeof(w) == Nothing 
+    if typeof(w) == Nothing
         return w
-    end 
+    end
 
-    return (w[l+1:end])
+    return (w[(l + 1):end])
 end
 
 
@@ -41,20 +38,15 @@ end
 # getBaseLocus = false   (optional)
 # varyLinearPart = false (optional)
 # ---------------------- Output:
-# result                 
-# sols                   
+# result
+# sols
 
-function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expression}} , poss_sagbi::Union{Vector{Vector{Expression}}, Vector{Expression}} ; weight = nothing, degreeCheck = true, getBaseLocus = false, varyLinearPart = false)
-    
-    if typeof(lin_sys) == Vector{Expression}
-        lin_sys = [lin_sys]
-    end
+function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expression}, Vector{Vector{Vector{Expression}}}}, poss_sagbi::Union{Vector{Vector{Expression}}, Vector{Expression}, Vector{Vector{Vector{Expression}}}}; weight = nothing, degreeCheck = true, getBaseLocus = false, varyLinearPart = false)
 
-    if typeof(poss_sagbi) == Vector{Expression}
-        poss_sagbi = [poss_sagbi]
-    end
+    lin_sys = normalize_param_groups(lin_sys)::Vector{Vector{Expression}}
+    poss_sagbi = normalize_param_groups(poss_sagbi)::Vector{Vector{Expression}}
 
-    if (length(poss_sagbi) != length(lin_sys) )
+    if (length(poss_sagbi) != length(lin_sys))
         return "Error: length of linear equations does not match length of parameterization"
     end
 
@@ -64,26 +56,26 @@ function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expres
         if weight == nothing
             return "Error: polynomials do not form a SAGBI basis."
         end
-    end 
+    end
 
 
     if degreeCheck
         #degree of maps check
-        d1 = degree_map(poss_sagbi) 
+        d1 = degree_map(poss_sagbi)
         d2 = degree_monomial_map(poss_sagbi, weight)
         if (d1 - d2 > 0)
             println("Error: degree of monomial parameterisation drops from ", d1, " to ", d2, ". SAGBI homotopy will not find all the solutions.")
         end
     end
 
-    
+
     vars_lin_sys = variables.(lin_sys)
     #vars_sagbi = unique(vcat(variables.(poss_sagbi)...))
-    vars_sagbi = variables(vcat(poss_sagbi...))
+    vars_sagbi = variables(flatten_expressions(poss_sagbi))
 
-    
+
     @unique_var t
-    deformed_sagbi = [ map(poly -> weight_deformation_for_poly(poly, vars_sagbi, weight, t = t), sagbi) for sagbi in poss_sagbi] 
+    deformed_sagbi = [ map(poly -> weight_deformation_for_poly(poly, vars_sagbi, weight, t = t), sagbi) for sagbi in poss_sagbi]
     randomnumber = randn(ComplexF64)
 
     if varyLinearPart
@@ -93,22 +85,22 @@ function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expres
 
             d = length(lin_sys[i])
             n = length(var)
-            A0 = randn(ComplexF64,d,n)
-            push!(new_lin_sys, (1-t).*(A0*var) + randomnumber*(t).*lin_sys[i])
+            A0 = randn(ComplexF64, d, n)
+            push!(new_lin_sys, (1 - t) .* (A0 * var) + randomnumber * (t) .* lin_sys[i])
         end
-        
-        new_sys = vcat([ subs(new_lin_sys[i], vars_lin_sys[i] => deformed_sagbi[i]) for i=1:length(new_lin_sys) ]...)
+
+        new_sys = vcat([ subs(new_lin_sys[i], vars_lin_sys[i] => deformed_sagbi[i]) for i in 1:length(new_lin_sys) ]...)
     else
-        new_sys = vcat([ subs(lin_sys[i], vars_lin_sys[i] => deformed_sagbi[i]) for i=1:length(lin_sys) ]...)
+        new_sys = vcat([ subs(lin_sys[i], vars_lin_sys[i] => deformed_sagbi[i]) for i in 1:length(lin_sys) ]...)
     end
 
     F = System(new_sys, variables = vars_sagbi, parameters = [t])
     start_solutions = solutions(HomotopyContinuation.solve(F; target_parameters = [0]))
-    
+
     result = HomotopyContinuation.solve(F, start_solutions; start_parameters = [0], target_parameters = [1])
-    
+
     sols = solutions(result)
-    
+
     if getBaseLocus
         base_sols = []
         for sagbi in poss_sagbi
@@ -117,10 +109,10 @@ function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expres
             if num_missing_sols > 0
                 missing_sols = get_base_locus(sagbi)
                 for missing_sol in missing_sols
-                    if norm( HomotopyContinuation.evaluate(F, missing_sol, [1]) , Inf) < 1e-10
+                    if norm(HomotopyContinuation.evaluate(F, missing_sol, [1]), Inf) < 1.0e-10
                         push!(base_sols, missing_sol)
                     end
-                end 
+                end
             end
         end
         base_sols = unique(base_sols)

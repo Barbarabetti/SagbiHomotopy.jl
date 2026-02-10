@@ -1,19 +1,41 @@
 name = "SagbiHomotopy"
 uuid = "79f7b27e-1e7f-49b0-a183-48c80ed555cb"
-authors = ["Barbara Betti and Viktoriia Borovik"]
 version = "1.0.2"
+authors = ["Barbara Betti and Viktoriia Borovik"]
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+Hecke = "3e1990a7-5d81-5526-99ce-9ba3ff248f21"
 HomotopyContinuation = "f213a82b-91d6-5c5d-acf7-10f1c761b327"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MultivariatePolynomials = "102ac46a-7ee4-5c85-9060-abc95bfdeaa3"
+Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
 Oscar = "f1435218-dba5-11e9-1e4d-f1a5fab5fc13"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-AbstractAlgebra = "0.43.12"
+Hecke = "0.39.3"
+LinearAlgebra = "1.12.0"
+MultivariatePolynomials = "0.5"
+Nemo = "0.52.4"
+Oscar = "1.6.0"
+AbstractAlgebra = "0.47"
 Combinatorics = "1.0.3"
-HomotopyContinuation = "2.14.0"
-Oscar = "1.2.2"
+julia = "1.10"
+Aqua = "0.8.11"
+CheckConcreteStructs = "0.1.0"
+ExplicitImports = "1.11"
+JET = "0.9.18, 0.10, 0.11"
 Test = "1.10"
-julia = "1.10, 1.11"
+HomotopyContinuation = "2.17"
+
+[extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+CheckConcreteStructs = "73c92db5-9da6-4938-911a-6443a7e94a58"
+ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Aqua", "JET", "CheckConcreteStructs", "Test", "ExplicitImports"]
