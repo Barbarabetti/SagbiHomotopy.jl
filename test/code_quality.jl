@@ -1,4 +1,3 @@
-
 @testset "Concretely typed" begin
     using CheckConcreteStructs
     all_concrete(SagbiHomotopy)

@@ -1,4 +1,3 @@
-
 @testset "Paper examples" begin
     Random.seed!(20260210)
 
@@ -61,8 +60,10 @@
         rng = MersenneTwister(20260210)
         @var p[1:4]
         @var q[1:4]
-        lin_sys = [rand(rng, -100:100, 2, 4) * p,
-            rand(rng, -100:100, 1, 4) * q]
+        lin_sys = [
+            rand(rng, -100:100, 2, 4) * p,
+            rand(rng, -100:100, 1, 4) * q,
+        ]
 
         res, sols = sagbi_homotopy(lin_sys, sagbi; weight = w)
         @test length(sols) == 6
