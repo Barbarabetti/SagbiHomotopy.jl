@@ -102,6 +102,13 @@ function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expres
     sols = solutions(result)
 
     if getBaseLocus
+        # Deduplicate solutions by a coarse numerical signature.
+        # This avoids adding the same base-locus point multiple times.
+        function _solution_signature(sol; digits::Int = 8)
+            coords = collect(sol)
+            return map(z -> (round(real(z); digits = digits), round(imag(z); digits = digits)), coords)
+        end
+
         base_sols = []
         for sagbi in poss_sagbi
             num_missing_sols = isolated_nsols_baselocus(sagbi)
@@ -109,14 +116,31 @@ function sagbi_homotopy(lin_sys::Union{Vector{Vector{Expression}}, Vector{Expres
             if num_missing_sols > 0
                 missing_sols = get_base_locus(sagbi)
                 for missing_sol in missing_sols
+                    # We compute the base locus inside the torus; exclude points with any
+                    # coordinate numerically close to 0.
+                    coords = collect(missing_sol)
+                    if any(z -> abs(z) < 1.0e-10, coords)
+                        continue
+                    end
                     if norm(HomotopyContinuation.evaluate(F, missing_sol, [1]), Inf) < 1.0e-10
                         push!(base_sols, missing_sol)
                     end
                 end
             end
         end
-        base_sols = unique(base_sols)
-        sols = vcat(sols, base_sols)
+
+        # unique() does not reliably deduplicate HomotopyContinuation solutions.
+        sigs = Set{Any}()
+        unique_base_sols = []
+        for sol in base_sols
+            sig = _solution_signature(sol)
+            if !(sig in sigs)
+                push!(sigs, sig)
+                push!(unique_base_sols, sol)
+            end
+        end
+
+        sols = vcat(sols, unique_base_sols)
     end
 
     println("SAGBI homotopy successfully completed with ", length(sols), " solutions.")

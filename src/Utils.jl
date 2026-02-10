@@ -124,9 +124,23 @@ function degree_map(parametrization::Union{Vector{Vector{Expression}}, Vector{Ex
     R, oscar_vars = polynomial_ring(QQ, string.(HC_vars))
     parametrization_Oscar = vcat([ map(f -> HC_to_oscar(f, oscar_vars, HC_vars), param) for param in parametrization ]...)
 
-    #get a generic point on the variety
+    # get a (likely) generic point on the variety
+    # We fix the auxiliary homogenizing variables s[i] to 1 to avoid special fibres
+    # (e.g. s=0) which can lead to unstable or incorrect degree computations.
     n = length(oscar_vars)
-    values = QQ.(rand(-random_range:random_range, n) .// rand(1:random_range, n))
+    values = Vector{typeof(QQ(1))}(undef, n)
+    s_set = Set(s)
+    for (i, v) in enumerate(HC_vars)
+        if v in s_set
+            values[i] = QQ(1)
+        else
+            # Avoid zero assignments to reduce the chance of sampling a non-generic
+            # point on the image (which can lower the observed fiber cardinality).
+            num = rand(vcat(-random_range:-1, 1:random_range))
+            den = rand(1:random_range)
+            values[i] = QQ(num // den)
+        end
+    end
     evaluation = [Oscar.evaluate(f, oscar_vars, values) for f in parametrization_Oscar]
 
     #solve equations for a generic fiber
