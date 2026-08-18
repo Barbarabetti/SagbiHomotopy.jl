@@ -1,6 +1,6 @@
 name = "SagbiHomotopy"
 uuid = "79f7b27e-1e7f-49b0-a183-48c80ed555cb"
-version = "1.0.3"
+version = "1.1.0"
 authors = ["Barbara Betti and Viktoriia Borovik"]
 
 [deps]
