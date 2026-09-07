@@ -59,6 +59,9 @@ end
 
 #run the function for the first time without storing the time
 F1, sagbi1 = oscillators(1, 5);
+F1 =[ Expression.(F1[i]) for i=1:length(F1)];
+sagbi1 = [Expression.(sagbi1[i]) for i=1:length(sagbi1)];
+
 w1 = vcat(fill(-2, 5), fill(-1, 5));
 
 sagbi_homotopy(F1, sagbi1, weight = w1, degreeCheck = false);
@@ -72,6 +75,8 @@ M = 5
 for s in 1:N
     for r in 1:M
         F, sagbi = oscillators(s, r)
+        F =[ Expression.(F[i]) for i=1:length(F)];
+        sagbi = [Expression.(sagbi[i]) for i=1:length(sagbi)];
         w = vcat(fill(-2, s * r), fill(-1, s * r))
 
         result, elapsed_time, allocations, _, _ = @timed sagbi_homotopy(F, sagbi, weight = w, degreeCheck = false, varyLinearPart = true)
